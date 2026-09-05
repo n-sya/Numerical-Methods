@@ -242,3 +242,32 @@ def gauss_legendre_quadrature(
         integral += weight * func(transformed_x)
 
     return half_width * integral
+
+# Double integration using repeated trapezoidal integration
+def double_trapezoidal_rule(x, y, z):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    z = np.asarray(z, dtype=float)
+
+    if z.shape != (y.size, x.size):
+        raise ValueError(
+            "z must have shape (len(y), len(x))."
+        )
+
+    if x.size < 2 or y.size < 2:
+        raise ValueError(
+            "At least two nodes are required in each direction."
+        )
+
+    intermediate_integral = np.zeros(y.size)
+
+    for i in range(y.size):
+        intermediate_integral[i] = trapezoidal_rule(
+            x,
+            z[i, :],
+        )
+
+    return trapezoidal_rule(
+        y,
+        intermediate_integral,
+    )

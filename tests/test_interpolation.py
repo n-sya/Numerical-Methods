@@ -270,5 +270,38 @@ class TestCubicSpline(unittest.TestCase):
             )
 
 
+def test_partial_pivoting(self):
+    A = np.array(
+        [
+            [0.0, 2.0],
+            [1.0, 1.0],
+        ]
+    )
+
+    b = np.array(
+        [
+            4.0,
+            3.0,
+        ]
+    )
+
+    solution = gaussian_elimination(
+        A,
+        b,
+    )
+
+    expected = np.array(
+        [
+            1.0,
+            2.0,
+        ]
+    )
+
+    np.testing.assert_allclose(
+        solution,
+        expected,
+        atol=1.0e-10,
+    )
+
 if __name__ == "__main__":
     unittest.main()

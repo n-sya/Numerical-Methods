@@ -2,6 +2,7 @@ import numpy as np
 
 from interpolation.interpolation import gaussian_elimination
 
+from ode.initial_value import runge_kutta_4_system
 
 # Finite-difference solution of a second-order linear ODE
 # y'' + f(x)y' + g(x)y = p(x)
@@ -181,3 +182,111 @@ def finite_difference_robin(
     )
 
     return x, y
+
+# Shooting method using secant iteration
+def shooting_method(
+    system,
+    initial_state_function,
+    residual_function,
+    t0,
+    t_end,
+    h,
+    first_guess,
+    second_guess,
+    tolerance=1.0e-8,
+    max_iterations=50,
+):
+    if tolerance <= 0:
+        raise ValueError("Tolerance must be positive.")
+
+    if max_iterations < 1:
+        raise ValueError(
+            "max_iterations must be at least 1."
+        )
+
+    def solve_with_guess(guess):
+        initial_state = np.asarray(
+            initial_state_function(guess),
+            dtype=float,
+        )
+
+        t, solution = runge_kutta_4_system(
+            system,
+            initial_state,
+            t0=t0,
+            t_end=t_end,
+            h=h,
+        )
+
+        residual = float(
+            residual_function(
+                t,
+                solution,
+            )
+        )
+
+        return (
+            t,
+            solution,
+            residual,
+        )
+
+    guess_previous = first_guess
+    guess_current = second_guess
+
+    _, _, residual_previous = solve_with_guess(
+        guess_previous
+    )
+
+    for iteration in range(
+        1,
+        max_iterations + 1,
+    ):
+        (
+            t,
+            solution,
+            residual_current,
+        ) = solve_with_guess(
+            guess_current
+        )
+
+        if abs(residual_current) < tolerance:
+            return (
+                t,
+                solution,
+                guess_current,
+                iteration,
+            )
+
+        denominator = (
+            residual_current
+            - residual_previous
+        )
+
+        if np.isclose(
+            denominator,
+            0.0,
+        ):
+            raise RuntimeError(
+                "The shooting method encountered "
+                "a zero secant denominator."
+            )
+
+        guess_next = (
+            guess_current
+            - residual_current
+            * (
+                guess_current
+                - guess_previous
+            )
+            / denominator
+        )
+
+        guess_previous = guess_current
+        residual_previous = residual_current
+        guess_current = guess_next
+
+    raise RuntimeError(
+        "The shooting method did not converge within "
+        "the maximum number of iterations."
+    )

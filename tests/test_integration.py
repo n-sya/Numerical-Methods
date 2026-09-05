@@ -4,6 +4,7 @@ import numpy as np
 
 from integration.integration import (
     adaptive_simpson,
+    double_trapezoidal_rule,
     gauss_legendre_quadrature,
     simpson_rule,
     trapezoidal_rule,
@@ -200,6 +201,87 @@ class TestGaussLegendreQuadrature(unittest.TestCase):
                 number_of_nodes=2,
             )
 
+
+class TestDoubleTrapezoidalRule(unittest.TestCase):
+    def test_linear_surface(self):
+        # z = x + y
+        # Integral from x=0 to 1 and y=0 to 1 is 1
+
+        x = np.linspace(
+            0.0,
+            1.0,
+            11,
+        )
+
+        y = np.linspace(
+            0.0,
+            1.0,
+            11,
+        )
+
+        x_grid, y_grid = np.meshgrid(
+            x,
+            y,
+        )
+
+        z = x_grid + y_grid
+
+        result = double_trapezoidal_rule(
+            x,
+            y,
+            z,
+        )
+
+        self.assertAlmostEqual(
+            result,
+            1.0,
+            places=12,
+        )
+
+    def test_invalid_shape(self):
+        x = np.linspace(
+            0.0,
+            1.0,
+            5,
+        )
+
+        y = np.linspace(
+            0.0,
+            1.0,
+            5,
+        )
+
+        z = np.zeros(
+            (4, 5)
+        )
+
+        with self.assertRaises(ValueError):
+            double_trapezoidal_rule(
+                x,
+                y,
+                z,
+            )
+
+    def test_insufficient_nodes(self):
+        x = np.array([0.0])
+
+        y = np.array(
+            [
+                0.0,
+                1.0,
+            ]
+        )
+
+        z = np.zeros(
+            (2, 1)
+        )
+
+        with self.assertRaises(ValueError):
+            double_trapezoidal_rule(
+                x,
+                y,
+                z,
+            )
 
 if __name__ == "__main__":
     unittest.main()

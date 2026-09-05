@@ -5,6 +5,7 @@ import numpy as np
 from ode.boundary_value import (
     finite_difference_dirichlet,
     finite_difference_robin,
+    shooting_method,
 )
 
 
@@ -189,6 +190,62 @@ class TestRobinBoundaryValue(unittest.TestCase):
                 number_of_intervals=20,
             )
 
+
+class TestShootingMethod(unittest.TestCase):
+    def test_linear_boundary_value_problem(self):
+        # y'' = 0
+        # y(0) = 1
+        # y(1) = 3
+        # exact solution: y = 1 + 2x
+
+        def system(x, y):
+            return np.array(
+                [
+                    y[1],
+                    0.0,
+                ]
+            )
+
+        def initial_state_function(initial_slope):
+            return np.array(
+                [
+                    1.0,
+                    initial_slope,
+                ]
+            )
+
+        def residual_function(x, solution):
+            return solution[0, -1] - 3.0
+
+        x, solution, initial_slope, iterations = (
+            shooting_method(
+                system,
+                initial_state_function,
+                residual_function,
+                t0=0.0,
+                t_end=1.0,
+                h=0.01,
+                first_guess=1.0,
+                second_guess=3.0,
+            )
+        )
+
+        self.assertAlmostEqual(
+            initial_slope,
+            2.0,
+            places=7,
+        )
+
+        np.testing.assert_allclose(
+            solution[0],
+            1.0 + 2.0 * x,
+            atol=1.0e-8,
+        )
+
+        self.assertGreater(
+            iterations,
+            0,
+        )
 
 if __name__ == "__main__":
     unittest.main()

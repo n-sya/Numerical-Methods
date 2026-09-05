@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ode.initial_value import runge_kutta_4_system
+from ode.boundary_value import shooting_method
 
 
 # Blasius equation written as a first-order system:
@@ -18,9 +18,9 @@ def blasius_system(eta, y):
     return derivative
 
 
-# Solve the Blasius problem for a given guess of f''(0)
-def solve_with_guess(initial_second_derivative):
-    initial_conditions = np.array(
+# Construct the initial conditions from a guess of f''(0)
+def initial_state_function(initial_second_derivative):
+    return np.array(
         [
             0.0,
             0.0,
@@ -28,91 +28,21 @@ def solve_with_guess(initial_second_derivative):
         ]
     )
 
-    eta, solution = runge_kutta_4_system(
-        blasius_system,
-        initial_conditions,
-        t0=0.0,
-        t_end=10.0,
-        h=0.01,
-    )
 
-    return eta, solution
-
-
-# Shooting method using the secant method
-def shooting_method(
-    first_guess,
-    second_guess,
-    tolerance=1.0e-8,
-    max_iterations=50,
-):
-    guess_previous = first_guess
-    guess_current = second_guess
-
-    _, solution_previous = solve_with_guess(
-        guess_previous
-    )
-
-    error_previous = (
-        solution_previous[1, -1] - 1.0
-    )
-
-    for iteration in range(
-        1,
-        max_iterations + 1,
-    ):
-        eta, solution_current = solve_with_guess(
-            guess_current
-        )
-
-        error_current = (
-            solution_current[1, -1] - 1.0
-        )
-
-        if abs(error_current) < tolerance:
-            return (
-                eta,
-                solution_current,
-                guess_current,
-                iteration,
-            )
-
-        denominator = (
-            error_current - error_previous
-        )
-
-        if np.isclose(
-            denominator,
-            0.0,
-        ):
-            raise RuntimeError(
-                "The shooting method encountered "
-                "a zero secant denominator."
-            )
-
-        guess_next = (
-            guess_current
-            - error_current
-            * (
-                guess_current
-                - guess_previous
-            )
-            / denominator
-        )
-
-        guess_previous = guess_current
-        error_previous = error_current
-        guess_current = guess_next
-
-    raise RuntimeError(
-        "The shooting method did not converge within "
-        "the maximum number of iterations."
-    )
+# Boundary condition residual at eta = 10
+def residual_function(eta, solution):
+    return solution[1, -1] - 1.0
 
 
 # Solve the boundary-value problem
 eta, solution, initial_second_derivative, iterations = (
     shooting_method(
+        blasius_system,
+        initial_state_function,
+        residual_function,
+        t0=0.0,
+        t_end=10.0,
+        h=0.01,
         first_guess=0.2,
         second_guess=0.5,
     )

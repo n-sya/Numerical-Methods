@@ -1,47 +1,106 @@
 import numpy as np
 
 
-# Gaussian elimination with back substitution
+# Gaussian elimination with partial pivoting
 def gaussian_elimination(A, b):
-    A = np.asarray(A, dtype=float).copy()
-    b = np.asarray(b, dtype=float).copy()
+    A = np.asarray(
+        A,
+        dtype=float,
+    ).copy()
 
-    if A.ndim != 2 or A.shape[0] != A.shape[1]:
+    b = np.asarray(
+        b,
+        dtype=float,
+    ).copy()
+
+    if A.ndim != 2:
+        raise ValueError("A must be a two-dimensional matrix.")
+
+    rows, columns = A.shape
+
+    if rows != columns:
         raise ValueError("A must be a square matrix.")
 
-    if b.size != A.shape[0]:
-        raise ValueError("b must contain one value for each row of A.")
-
-    number_of_equations = len(b)
-
-    for i in range(number_of_equations - 1):
-        if np.isclose(A[i, i], 0.0):
-            raise ValueError(
-                "Zero pivot encountered during Gaussian elimination."
-            )
-
-        for j in range(i + 1, number_of_equations):
-            factor = A[j, i] / A[i, i]
-            A[j, :] -= factor * A[i, :]
-            b[j] -= factor * b[i]
-
-    if np.isclose(A[-1, -1], 0.0):
+    if b.ndim != 1 or b.size != rows:
         raise ValueError(
-            "Zero pivot encountered during Gaussian elimination."
+            "b must be a one-dimensional array "
+            "with the same number of entries as A has rows."
         )
 
-    x = np.zeros(number_of_equations)
+    n = rows
 
-    for i in range(number_of_equations - 1, -1, -1):
-        x[i] = b[i]
+    # Forward elimination
+    for k in range(n - 1):
+        pivot_row = k + np.argmax(
+            np.abs(A[k:, k])
+        )
 
-        for j in range(i + 1, number_of_equations):
-            x[i] -= A[i, j] * x[j]
+        if np.isclose(
+            A[pivot_row, k],
+            0.0,
+        ):
+            raise ValueError(
+                "The matrix is singular."
+            )
 
-        x[i] /= A[i, i]
+        if pivot_row != k:
+            A[[k, pivot_row]] = A[
+                [pivot_row, k]
+            ]
+
+            b[[k, pivot_row]] = b[
+                [pivot_row, k]
+            ]
+
+        for i in range(
+            k + 1,
+            n,
+        ):
+            factor = A[i, k] / A[k, k]
+
+            A[i, k:] = (
+                A[i, k:]
+                - factor * A[k, k:]
+            )
+
+            b[i] = (
+                b[i]
+                - factor * b[k]
+            )
+
+    if np.isclose(
+        A[-1, -1],
+        0.0,
+    ):
+        raise ValueError(
+            "The matrix is singular."
+        )
+
+    # Back substitution
+    x = np.zeros(n)
+
+    for i in range(
+        n - 1,
+        -1,
+        -1,
+    ):
+        if np.isclose(
+            A[i, i],
+            0.0,
+        ):
+            raise ValueError(
+                "The matrix is singular."
+            )
+
+        x[i] = (
+            b[i]
+            - np.dot(
+                A[i, i + 1 :],
+                x[i + 1 :],
+            )
+        ) / A[i, i]
 
     return x
-
 
 # Lagrange basis polynomial
 def lagrange_basis(index, x_nodes, x):
