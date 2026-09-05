@@ -102,4 +102,11 @@ plt.legend()
 plt.gca().invert_xaxis()
 
 plt.tight_layout()
+
+plt.savefig(
+    "outputs/differentiation_convergence.png",
+    dpi=300,
+    bbox_inches="tight",
+)
+
 plt.show()

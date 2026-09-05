@@ -71,4 +71,10 @@ plt.grid(True, which="both")
 plt.legend()
 
 plt.tight_layout()
+
+plt.savefig(
+    "outputs/integration_convergence.png",
+    dpi=300,
+    bbox_inches="tight",
+)
 plt.show()

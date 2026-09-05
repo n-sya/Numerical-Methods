@@ -120,4 +120,11 @@ plt.grid(True)
 plt.legend()
 
 plt.tight_layout()
+
+plt.savefig(
+    "outputs/blasius_boundary_layer.png",
+    dpi=300,
+    bbox_inches="tight",
+)
+
 plt.show()

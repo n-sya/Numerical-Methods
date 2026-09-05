@@ -73,6 +73,35 @@ Boundary-value problems:
 **Root Finding**
 - Comparison of bisection and Newton-Raphson methods for a nonlinear equation
 
+
+# Results
+
+Selected results demonstrating numerical convergence and engineering applications.
+
+**Numerical Integration Convergence**
+
+![Numerical Integration Convergence](outputs/integration_convergence.png)
+
+Comparison of the absolute error of the composite trapezoidal and Simpson's rules under progressive grid refinement.
+
+**Numerical Differentiation Convergence**
+
+![Numerical Differentiation Convergence](outputs/differentiation_convergence.png)
+
+Convergence comparison of forward, backward, and central finite-difference approximations.
+
+**ODE Solver Convergence**
+
+![ODE Solver Convergence](outputs/ode_convergence.png)
+
+Error comparison of Forward Euler, Backward Euler, and fourth-order Runge-Kutta methods as the time step is refined.
+
+**Blasius Boundary-Layer Solution**
+
+![Blasius Boundary Layer](outputs/blasius_boundary_layer.png)
+
+Numerical solution of the Blasius boundary-layer equation using a shooting method with RK4 integration and secant iteration.
+
 # Verification
 
 Where possible, numerical results are compared against analytical solutions or known reference values.
