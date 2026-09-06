@@ -2,7 +2,7 @@
 
 A Python library implementing and verifying numerical methods commonly used in engineering analysis.
 
-The repository brings together numerical techniques for interpolation, differentiation, integration, ordinary differential equations, boundary-value problems, and nonlinear root finding. The methods are implemented directly in Python and NumPy, with engineering examples and analytical comparisons used to assess their accuracy and behaviour.
+The repository brings together numerical techniques for interpolation, differentiation, integration, ordinary differential equations, boundary-value problems, and nonlinear root finding. The methods are implemented directly in Python and NumPy, with engineering examples, analytical comparisons, unit tests, and JSON-driven functional tests used to assess their accuracy and behaviour.
 
 # Methods Implemented
 
@@ -130,15 +130,37 @@ Interpolation of nodal values across a two-dimensional triangular element using 
 
 Absolute difference between barycentric-coordinate and inverse-distance interpolation across the same triangular element.
 
-# Verification
+# Verification and Testing
 
-Where possible, numerical results are compared against analytical solutions or known reference values.
+Numerical methods are verified against analytical solutions, known reference values, or mathematical properties where appropriate.
 
-The repository includes automated unit tests covering the core numerical methods. Tests assess numerical accuracy, input validation, boundary conditions, convergence behaviour, and error handling.
+The repository uses two levels of automated testing:
+
+**Unit Tests**
+
+The `tests/` directory contains tests for individual numerical methods. These assess numerical accuracy, input validation, boundary conditions, convergence behaviour, and error handling.
 
 The triangular interpolation implementation is additionally verified using properties of barycentric coordinates, including reproduction of a linear field and exact recovery of values at triangle vertices. Degenerate triangular elements are detected and rejected.
 
-Run the complete test suite using:
+Run the unit test suite using:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+**Functional Tests**
+
+The `functional_tests/` directory provides higher-level tests of the numerical library using test cases defined externally in JSON.
+
+The functional test suite loads numerical inputs, expected results, and tolerances from `test_cases.json` and verifies integration, differentiation, triangular interpolation, and root-finding functionality through the public numerical-method interfaces.
+
+Run the functional test suite using:
+
+```bash
+python -m unittest functional_tests.test_functional -v
+```
+
+Run all discoverable tests using:
 
 ```bash
 python -m unittest discover -v
@@ -171,8 +193,13 @@ Numerical-Methods/
 ├── tests/
 │   ├── ...
 │   └── test_triangle_interpolation.py
+├── functional_tests/
+│   ├── __init__.py
+│   ├── test_cases.json
+│   └── test_functional.py
 ├── data/
 ├── outputs/
+├── main.py
 ├── README.md
 ├── requirements.txt
 ├── LICENSE
@@ -220,6 +247,12 @@ interpolated_value = barycentric_interpolation(vertices, values, point)
 print(interpolated_value)
 ```
 
+Run a demonstration of the main numerical methods using:
+
+```bash
+python main.py
+```
+
 Individual engineering examples can be run directly from the repository root:
 
 ```bash
@@ -246,4 +279,4 @@ pip install -r requirements.txt
 
 This repository was developed to consolidate numerical methods used throughout engineering analysis into a structured and reusable Python codebase.
 
-The focus is not only on implementing each numerical technique, but also on understanding its numerical behaviour through verification, convergence studies, and engineering applications.
+The focus is not only on implementing each numerical technique, but also on understanding its numerical behaviour through verification, convergence studies, and engineering applications. The separation between reusable numerical methods, engineering examples, unit tests, and JSON-driven functional tests provides a structured approach to both implementation and validation.
