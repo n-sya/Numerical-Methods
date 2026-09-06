@@ -202,7 +202,6 @@ Numerical-Methods/
 ├── main.py
 ├── README.md
 ├── requirements.txt
-├── LICENSE
 └── .gitignore
 ```
 
