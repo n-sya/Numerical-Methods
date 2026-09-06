@@ -2,11 +2,12 @@
 
 A Python library implementing and verifying numerical methods commonly used in engineering analysis.
 
-The repository brings together numerical techniques for interpolation, differentiation, integration, ordinary differential equations, boundary-value problems, and nonlinear root finding. The methods are implemented directly in Python and NumPy, with engineering examples and analytical comparisons used to assess their accuracy and behaviour.
+The repository brings together numerical techniques for interpolation, differentiation, integration, ordinary differential equations, boundary-value problems, and nonlinear root finding. The methods are implemented directly in Python and NumPy, with engineering examples, analytical comparisons, unit tests, and JSON-driven functional tests used to assess their accuracy and behaviour.
 
 # Methods Implemented
 
 **Numerical Integration**
+
 - Trapezoidal rule
 - Simpson's rule
 - Adaptive Simpson integration
@@ -14,6 +15,7 @@ The repository brings together numerical techniques for interpolation, different
 - Double integration using repeated trapezoidal integration
 
 **Numerical Differentiation**
+
 - Forward difference
 - Backward difference
 - Central difference
@@ -21,26 +23,33 @@ The repository brings together numerical techniques for interpolation, different
 - Higher-order backward derivatives
 
 **Interpolation and Linear Systems**
+
 - Lagrange interpolation
 - Newton divided differences
 - Newton interpolation
 - Cubic spline interpolation
+- Bilinear interpolation
+- Barycentric-coordinate interpolation over triangular elements
+- Inverse-distance interpolation over triangular elements
 - Gaussian elimination with partial pivoting
 
 **Ordinary Differential Equations**
 
 Initial-value problems:
+
 - Forward Euler method
 - Backward Euler method
 - Fourth-order Runge-Kutta method
 - Systems of coupled ODEs
 
 Boundary-value problems:
+
 - Finite-difference method with Dirichlet boundary conditions
 - Finite-difference method with Robin boundary conditions
 - Shooting method using secant iteration
 
 **Root Finding**
+
 - Bisection method
 - Newton-Raphson method
 - Newton's method for systems of nonlinear equations
@@ -49,21 +58,28 @@ Boundary-value problems:
 # Engineering Examples
 
 **Integration**
+
 - Convergence comparison of trapezoidal and Simpson's rules
 - Aerofoil volume calculation from discrete surface data
 - Numerical estimation of the volume of an ellipsoidal dome using double integration
 
 **Differentiation**
+
 - Convergence of forward, backward, and central finite differences
 - Rocket acceleration calculated from discrete velocity data
 
 **Interpolation**
+
 - Polynomial interpolation and comparison of polynomial orders
 - Runge phenomenon
 - Cubic spline interpolation
 - Bilinear image interpolation
+- Barycentric interpolation over a two-dimensional triangular element
+- Inverse-distance interpolation over a two-dimensional triangular element
+- Comparison of barycentric and inverse-distance interpolation across a triangle
 
 **Ordinary Differential Equations**
+
 - Convergence comparison of Forward Euler, Backward Euler, and RK4
 - Coupled three-mass spring system
 - Nonlinear double pendulum
@@ -71,8 +87,8 @@ Boundary-value problems:
 - Blasius boundary-layer equation solved using a shooting method
 
 **Root Finding**
-- Comparison of bisection and Newton-Raphson methods for a nonlinear equation
 
+- Comparison of bisection and Newton-Raphson methods for a nonlinear equation
 
 # Results
 
@@ -102,13 +118,49 @@ Error comparison of Forward Euler, Backward Euler, and fourth-order Runge-Kutta 
 
 Numerical solution of the Blasius boundary-layer equation using a shooting method with RK4 integration and secant iteration.
 
-# Verification
+**Barycentric Triangle Interpolation**
 
-Where possible, numerical results are compared against analytical solutions or known reference values.
+![Barycentric Triangle Interpolation](outputs/barycentric_triangle_interpolation.png)
 
-The repository includes automated unit tests covering the core numerical methods. Tests assess numerical accuracy, input validation, boundary conditions, convergence behaviour, and error handling.
+Interpolation of nodal values across a two-dimensional triangular element using barycentric coordinates.
 
-Run the complete test suite using:
+**Triangle Interpolation Method Comparison**
+
+![Triangle Interpolation Difference](outputs/triangle_interpolation_difference.png)
+
+Absolute difference between barycentric-coordinate and inverse-distance interpolation across the same triangular element.
+
+# Verification and Testing
+
+Numerical methods are verified against analytical solutions, known reference values, or mathematical properties where appropriate.
+
+The repository uses two levels of automated testing:
+
+**Unit Tests**
+
+The `tests/` directory contains tests for individual numerical methods. These assess numerical accuracy, input validation, boundary conditions, convergence behaviour, and error handling.
+
+The triangular interpolation implementation is additionally verified using properties of barycentric coordinates, including reproduction of a linear field and exact recovery of values at triangle vertices. Degenerate triangular elements are detected and rejected.
+
+Run the unit test suite using:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+**Functional Tests**
+
+The `functional_tests/` directory provides higher-level tests of the numerical library using test cases defined externally in JSON.
+
+The functional test suite loads numerical inputs, expected results, and tolerances from `test_cases.json` and verifies integration, differentiation, triangular interpolation, and root-finding functionality through the public numerical-method interfaces.
+
+Run the functional test suite using:
+
+```bash
+python -m unittest functional_tests.test_functional -v
+```
+
+Run all discoverable tests using:
 
 ```bash
 python -m unittest discover -v
@@ -126,7 +178,8 @@ Numerical-Methods/
 │   └── differentiation.py
 ├── interpolation/
 │   ├── __init__.py
-│   └── interpolation.py
+│   ├── interpolation.py
+│   └── triangle_interpolation.py
 ├── ode/
 │   ├── __init__.py
 │   ├── initial_value.py
@@ -135,9 +188,18 @@ Numerical-Methods/
 │   ├── __init__.py
 │   └── root_finding.py
 ├── examples/
+│   ├── ...
+│   └── triangle_interpolation_comparison.py
 ├── tests/
+│   ├── ...
+│   └── test_triangle_interpolation.py
+├── functional_tests/
+│   ├── __init__.py
+│   ├── test_cases.json
+│   └── test_functional.py
 ├── data/
 ├── outputs/
+├── main.py
 ├── README.md
 ├── requirements.txt
 ├── LICENSE
@@ -169,6 +231,28 @@ The analytical value is:
 1/3 = 0.333333...
 ```
 
+Barycentric interpolation can similarly be used to interpolate a value within a triangular element:
+
+```python
+import numpy as np
+
+from interpolation.triangle_interpolation import barycentric_interpolation
+
+vertices = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+values = np.array([1.0, 2.0, 3.0])
+point = np.array([0.25, 0.25])
+
+interpolated_value = barycentric_interpolation(vertices, values, point)
+
+print(interpolated_value)
+```
+
+Run a demonstration of the main numerical methods using:
+
+```bash
+python main.py
+```
+
 Individual engineering examples can be run directly from the repository root:
 
 ```bash
@@ -176,6 +260,7 @@ python -m examples.integration_convergence
 python -m examples.coupled_spring_mass
 python -m examples.blasius_shooting
 python -m examples.root_finding_comparison
+python -m examples.triangle_interpolation_comparison
 ```
 
 # Dependencies
@@ -194,4 +279,4 @@ pip install -r requirements.txt
 
 This repository was developed to consolidate numerical methods used throughout engineering analysis into a structured and reusable Python codebase.
 
-The focus is not only on implementing each numerical technique, but also on understanding its numerical behaviour through verification, convergence studies, and engineering applications.
+The focus is not only on implementing each numerical technique, but also on understanding its numerical behaviour through verification, convergence studies, and engineering applications. The separation between reusable numerical methods, engineering examples, unit tests, and JSON-driven functional tests provides a structured approach to both implementation and validation.

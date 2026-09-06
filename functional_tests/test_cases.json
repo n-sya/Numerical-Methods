@@ -1,0 +1,31 @@
+{
+  "integration": {
+    "x": [0.0, 0.25, 0.5, 0.75, 1.0],
+    "y": [0.0, 0.0625, 0.25, 0.5625, 1.0],
+    "expected": 0.3333333333333333,
+    "tolerance": 0.001
+  },
+  "differentiation": {
+    "point": 2.0,
+    "step_size": 0.00001,
+    "expected": 12.0,
+    "tolerance": 0.001
+  },
+  "triangle_interpolation": {
+    "vertices": [
+      [0.0, 0.0],
+      [1.0, 0.0],
+      [0.0, 1.0]
+    ],
+    "values": [1.0, 2.0, 3.0],
+    "point": [0.25, 0.25],
+    "expected": 1.75,
+    "tolerance": 0.000001
+  },
+  "root_finding": {
+    "lower_bound": 1.0,
+    "upper_bound": 2.0,
+    "expected": 1.5213797068,
+    "tolerance": 0.000001
+  }
+}
